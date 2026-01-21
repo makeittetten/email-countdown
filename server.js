@@ -8,7 +8,6 @@ app.get("/countdown", (req, res) => {
   const width = 600;
   const height = 120;
 
-  // End date – Berlin time
   const endDate = new Date("2026-01-23T15:30:00+01:00").getTime();
   const now = Date.now();
   let diff = endDate - now;
@@ -22,11 +21,9 @@ app.get("/countdown", (req, res) => {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  // Background
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, width, height);
 
-  // Text
   ctx.fillStyle = "#82483a";
   ctx.font = "bold 32px Arial";
   ctx.textAlign = "center";
@@ -48,5 +45,5 @@ app.get("/countdown", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Countdown server running on port ${PORT}`);
+  console.log("Countdown server running");
 });
