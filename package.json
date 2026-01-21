@@ -1,7 +1,6 @@
 {
   "name": "email-countdown",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
@@ -10,3 +9,4 @@
     "canvas": "^2.11.2"
   }
 }
+
