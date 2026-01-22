@@ -4,6 +4,11 @@ const { createCanvas } = require("canvas");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+/* Health / root route */
+app.get("/", (req, res) => {
+  res.send("OK – countdown server running");
+});
+
 app.get("/countdown", (req, res) => {
   try {
     const expiry = Number(req.query.expiry);
@@ -28,7 +33,7 @@ app.get("/countdown", (req, res) => {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, 600, 120);
 
-    // Text (safe font)
+    // Text (system-safe font)
     ctx.fillStyle = "#82483a";
     ctx.font = "30px sans-serif";
     ctx.textAlign = "center";
@@ -42,13 +47,16 @@ app.get("/countdown", (req, res) => {
 
     ctx.fillText(text, 300, 60);
 
+    // IMPORTANT: create buffer safely
     const buffer = canvas.toBuffer("image/png");
 
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    res.status(200).send(buffer);
+    res.writeHead(200, {
+      "Content-Type": "image/png",
+      "Cache-Control": "no-cache, no-store, must-revalidate"
+    });
+    res.end(buffer);
   } catch (err) {
-    console.error("Countdown error:", err);
+    console.error("🔥 Countdown runtime error:", err);
     res.status(500).send("Internal Server Error");
   }
 });
