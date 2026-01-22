@@ -28,7 +28,7 @@ app.get("/countdown", (req, res) => {
     const seconds = Math.floor((diff % 60000) / 1000);
 
     /* Canvas */
-    const canvas = createCanvas(600, 150);
+    const canvas = createCanvas(400, 80);
     const ctx = canvas.getContext("2d");
 
     // Background
