@@ -1,66 +1,31 @@
-const express = require("express");
-const { createCanvas } = require("canvas");
+const canvas = createCanvas(600, 150);
+const ctx = canvas.getContext("2d");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Background
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(0, 0, 600, 150);
 
-/* Health / root route */
-app.get("/", (req, res) => {
-  res.send("OK – countdown server running");
-});
+// Layout
+const colWidth = 600 / 4;
+const numberY = 55;
+const labelY = 95;
 
-app.get("/countdown", (req, res) => {
-  try {
-    const expiry = Number(req.query.expiry);
+// Numbers
+ctx.fillStyle = "#82483a";
+ctx.font = "bold 32px sans-serif";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
 
-    if (!expiry || Number.isNaN(expiry)) {
-      return res.status(400).send("Invalid or missing ?expiry= parameter");
-    }
+ctx.fillText(String(days).padStart(2, "0"), colWidth * 0.5, numberY);
+ctx.fillText(String(hours).padStart(2, "0"), colWidth * 1.5, numberY);
+ctx.fillText(String(minutes).padStart(2, "0"), colWidth * 2.5, numberY);
+ctx.fillText(String(seconds).padStart(2, "0"), colWidth * 3.5, numberY);
 
-    const now = Date.now();
-    let diff = expiry - now;
-    if (diff < 0) diff = 0;
+// Labels
+ctx.font = "12px sans-serif";
+ctx.fillStyle = "#82483a";
 
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-
-    const canvas = createCanvas(600, 120);
-    const ctx = canvas.getContext("2d");
-
-    // Background
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 600, 120);
-
-    // Text (system-safe font)
-    ctx.fillStyle = "#82483a";
-    ctx.font = "30px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const text =
-      `${String(days).padStart(2, "0")} : ` +
-      `${String(hours).padStart(2, "0")} : ` +
-      `${String(minutes).padStart(2, "0")} : ` +
-      `${String(seconds).padStart(2, "0")}`;
-
-    ctx.fillText(text, 300, 60);
-
-    // IMPORTANT: create buffer safely
-    const buffer = canvas.toBuffer("image/png");
-
-    res.writeHead(200, {
-      "Content-Type": "image/png",
-      "Cache-Control": "no-cache, no-store, must-revalidate"
-    });
-    res.end(buffer);
-  } catch (err) {
-    console.error("🔥 Countdown runtime error:", err);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-app.listen(PORT, () => {
-  console.log("✅ Countdown server running on port", PORT);
-});
+ctx.fillText("TAGE", colWidth * 0.5, labelY);
+ctx.fillText("STUNDEN", colWidth * 1.5, labelY);
+ctx.fillText("MINUTEN", colWidth * 2.5, labelY);
+ctx.fillText("SEKUNDEN", colWidth * 3.5, labelY);
