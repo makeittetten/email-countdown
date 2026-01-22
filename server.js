@@ -46,8 +46,3 @@ for (let i = 0; i < 4; i++) {
   ctx.font = "12px sans-serif";
   ctx.fillText(labels[i], x + boxWidth / 2, boxY + 68);
 }
-
-ctx.fillText("TAGE", colWidth * 0.5, labelY);
-ctx.fillText("STUNDEN", colWidth * 1.5, labelY);
-ctx.fillText("MINUTEN", colWidth * 2.5, labelY);
-ctx.fillText("SEKUNDEN", colWidth * 3.5, labelY);
