@@ -5,15 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get("/countdown", (req, res) => {
-  console.log("➡️ /countdown called");
-
   try {
     const expiry = Number(req.query.expiry);
-    console.log("expiry param:", expiry);
 
     if (!expiry || Number.isNaN(expiry)) {
-      console.log("❌ invalid expiry");
-      return res.status(400).send("Invalid or missing ?expiry=");
+      return res.status(400).send("Invalid or missing ?expiry= parameter");
     }
 
     const now = Date.now();
@@ -25,21 +21,25 @@ app.get("/countdown", (req, res) => {
     const minutes = Math.floor((diff % 3600000) / 60000);
     const seconds = Math.floor((diff % 60000) / 1000);
 
-    console.log("time parts:", days, hours, minutes, seconds);
-
     const canvas = createCanvas(600, 120);
     const ctx = canvas.getContext("2d");
 
-    // VERY BASIC rendering (no fonts that can crash)
+    // Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, 600, 120);
 
+    // Text (safe font)
     ctx.fillStyle = "#82483a";
     ctx.font = "30px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    const text = `${days} : ${hours} : ${minutes} : ${seconds}`;
+    const text =
+      `${String(days).padStart(2, "0")} : ` +
+      `${String(hours).padStart(2, "0")} : ` +
+      `${String(minutes).padStart(2, "0")} : ` +
+      `${String(seconds).padStart(2, "0")}`;
+
     ctx.fillText(text, 300, 60);
 
     const buffer = canvas.toBuffer("image/png");
@@ -47,14 +47,12 @@ app.get("/countdown", (req, res) => {
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     res.status(200).send(buffer);
-
-    console.log("✅ image sent");
   } catch (err) {
-    console.error("🔥 SERVER ERROR:", err);
+    console.error("Countdown error:", err);
     res.status(500).send("Internal Server Error");
   }
 });
 
 app.listen(PORT, () => {
-  console.log("🚀 Countdown server running on port", PORT);
+  console.log("✅ Countdown server running on port", PORT);
 });
