@@ -1,52 +1,60 @@
+const express = require("express");
+const { createCanvas } = require("canvas");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.get("/countdown", (req, res) => {
+  console.log("➡️ /countdown called");
+
   try {
     const expiry = Number(req.query.expiry);
+    console.log("expiry param:", expiry);
 
-    if (!expiry || isNaN(expiry)) {
-      res.status(400).send("Invalid or missing ?expiry= parameter");
-      return;
+    if (!expiry || Number.isNaN(expiry)) {
+      console.log("❌ invalid expiry");
+      return res.status(400).send("Invalid or missing ?expiry=");
     }
-
-    const width = 600;
-    const height = 120;
 
     const now = Date.now();
     let diff = expiry - now;
     if (diff < 0) diff = 0;
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
 
-    const canvas = createCanvas(width, height);
+    console.log("time parts:", days, hours, minutes, seconds);
+
+    const canvas = createCanvas(600, 120);
     const ctx = canvas.getContext("2d");
 
-    // Background
+    // VERY BASIC rendering (no fonts that can crash)
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, 600, 120);
 
-    // Text
     ctx.fillStyle = "#82483a";
-    ctx.font = "bold 32px Arial";
+    ctx.font = "30px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    const text =
-      `${String(days).padStart(2, "0")} : ` +
-      `${String(hours).padStart(2, "0")} : ` +
-      `${String(minutes).padStart(2, "0")} : ` +
-      `${String(seconds).padStart(2, "0")}`;
-
-    ctx.fillText(text, width / 2, height / 2);
+    const text = `${days} : ${hours} : ${minutes} : ${seconds}`;
+    ctx.fillText(text, 300, 60);
 
     const buffer = canvas.toBuffer("image/png");
 
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     res.status(200).send(buffer);
+
+    console.log("✅ image sent");
   } catch (err) {
-    console.error(err);
+    console.error("🔥 SERVER ERROR:", err);
     res.status(500).send("Internal Server Error");
   }
+});
+
+app.listen(PORT, () => {
+  console.log("🚀 Countdown server running on port", PORT);
 });
