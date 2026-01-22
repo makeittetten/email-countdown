@@ -1,49 +1,52 @@
-const express = require("express");
-const { createCanvas } = require("canvas");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.get("/countdown", (req, res) => {
-  const width = 600;
-  const height = 120;
+  try {
+    const expiry = Number(req.query.expiry);
 
-  const endDate = new Date("2026-01-30T15:30:00+01:00").getTime();
-  const now = Date.now();
-  let diff = endDate - now;
-  if (diff < 0) diff = 0;
+    if (!expiry || isNaN(expiry)) {
+      res.status(400).send("Invalid or missing ?expiry= parameter");
+      return;
+    }
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
+    const width = 600;
+    const height = 120;
 
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext("2d");
+    const now = Date.now();
+    let diff = expiry - now;
+    if (diff < 0) diff = 0;
 
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
-  ctx.fillStyle = "#82483a";
-  ctx.font = "bold 32px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext("2d");
 
-  const text =
-    `${String(days).padStart(2, "0")} : ` +
-    `${String(hours).padStart(2, "0")} : ` +
-    `${String(minutes).padStart(2, "0")} : ` +
-    `${String(seconds).padStart(2, "0")}`;
+    // Background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
 
-  ctx.fillText(text, width / 2, height / 2);
+    // Text
+    ctx.fillStyle = "#82483a";
+    ctx.font = "bold 32px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-  const buffer = canvas.toBuffer("image/png");
+    const text =
+      `${String(days).padStart(2, "0")} : ` +
+      `${String(hours).padStart(2, "0")} : ` +
+      `${String(minutes).padStart(2, "0")} : ` +
+      `${String(seconds).padStart(2, "0")}`;
 
-  res.setHeader("Content-Type", "image/png");
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.send(buffer);
-});
+    ctx.fillText(text, width / 2, height / 2);
 
-app.listen(PORT, () => {
-  console.log("Countdown server running");
+    const buffer = canvas.toBuffer("image/png");
+
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.status(200).send(buffer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
 });
