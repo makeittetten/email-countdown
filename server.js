@@ -29,8 +29,8 @@ app.get("/countdown", (req, res) => {
     const height = size === 600 ? 120 : 80;
 
     // Layout tuning per size
-    const numberFontSize = size === 600 ? 32 : 24;
-    const labelFontSize = size === 600 ? 11 : 10;
+    const numberFontSize = size === 600 ? 42 : 24;
+    const labelFontSize = size === 600 ? 16 : 10;
 
     const numberY = size === 600 ? 45 : 28;
     const labelY = size === 600 ? 75 : 52;
