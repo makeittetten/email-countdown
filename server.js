@@ -72,7 +72,7 @@ app.get("/countdown", (req, res) => {
 
     // Numbers
     ctx.fillStyle = brandColor;
-    ctx.font = `bold ${numberFontSize}px sans-serif`;
+    ctx.font = `${numberFontSize}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
