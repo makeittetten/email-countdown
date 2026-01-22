@@ -8,7 +8,7 @@ app.get("/countdown", (req, res) => {
   const width = 600;
   const height = 120;
 
-  const endDate = new Date("2026-01-23T15:30:00+01:00").getTime();
+  const endDate = new Date("2026-01-30T15:30:00+01:00").getTime();
   const now = Date.now();
   let diff = endDate - now;
   if (diff < 0) diff = 0;
