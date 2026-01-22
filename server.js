@@ -1,48 +1,77 @@
-const canvas = createCanvas(600, 180);
-const ctx = canvas.getContext("2d");
+app.get("/countdown", (req, res) => {
+  try {
+    const expiry = Number(req.query.expiry);
 
-// Background
-ctx.fillStyle = "#ffffff";
-ctx.fillRect(0, 0, 600, 180);
+    if (!expiry || Number.isNaN(expiry)) {
+      return res.status(400).send("Invalid or missing ?expiry= parameter");
+    }
 
-// Layout
-const boxWidth = 120;
-const boxHeight = 90;
-const gap = 20;
-const startX = 30;
-const boxY = 30;
+    const now = Date.now();
+    let diff = expiry - now;
+    if (diff < 0) diff = 0; // <-- stays at 0 when expired
 
-// Colors
-const boxBorder = "#e0e0e0";
-const textColor = "#82483a";
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
 
-// Data
-const values = [
-  String(days).padStart(2, "0"),
-  String(hours).padStart(2, "0"),
-  String(minutes).padStart(2, "0"),
-  String(seconds).padStart(2, "0")
-];
+    const canvas = createCanvas(600, 180);
+    const ctx = canvas.getContext("2d");
 
-const labels = ["TAGE", "STUNDEN", "MINUTEN", "SEKUNDEN"];
+    // Background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 600, 180);
 
-// Draw boxes
-for (let i = 0; i < 4; i++) {
-  const x = startX + i * (boxWidth + gap);
+    // Layout
+    const boxWidth = 120;
+    const boxHeight = 90;
+    const gap = 20;
+    const startX = 30;
+    const boxY = 30;
 
-  // Box
-  ctx.strokeStyle = boxBorder;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(x, boxY, boxWidth, boxHeight);
+    // Fixed brand color
+    const brandColor = "#9CAA82";
+    const borderColor = "#e5e5e5";
 
-  // Number
-  ctx.fillStyle = textColor;
-  ctx.font = "bold 32px sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(values[i], x + boxWidth / 2, boxY + 32);
+    const values = [
+      String(days).padStart(2, "0"),
+      String(hours).padStart(2, "0"),
+      String(minutes).padStart(2, "0"),
+      String(seconds).padStart(2, "0")
+    ];
 
-  // Label
-  ctx.font = "12px sans-serif";
-  ctx.fillText(labels[i], x + boxWidth / 2, boxY + 68);
-}
+    // German labels (fixed)
+    const labels = ["TAGE", "STUNDEN", "MINUTEN", "SEKUNDEN"];
+
+    for (let i = 0; i < 4; i++) {
+      const x = startX + i * (boxWidth + gap);
+
+      // Box
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, boxY, boxWidth, boxHeight);
+
+      // Number
+      ctx.fillStyle = brandColor;
+      ctx.font = "bold 32px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(values[i], x + boxWidth / 2, boxY + 34);
+
+      // Label
+      ctx.font = "12px sans-serif";
+      ctx.fillText(labels[i], x + boxWidth / 2, boxY + 68);
+    }
+
+    const buffer = canvas.toBuffer("image/png");
+
+    res.writeHead(200, {
+      "Content-Type": "image/png",
+      "Cache-Control": "no-cache, no-store, must-revalidate"
+    });
+    res.end(buffer);
+  } catch (err) {
+    console.error("Countdown error:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
