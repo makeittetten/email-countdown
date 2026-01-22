@@ -53,7 +53,7 @@ app.get("/countdown", (req, res) => {
 
     // Numbers
     ctx.fillStyle = brandColor;
-    ctx.font = "bold 32px sans-serif";
+    ctx.font = "42px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -63,7 +63,7 @@ app.get("/countdown", (req, res) => {
 
     // Labels (black, Sendtric-like size)
     ctx.fillStyle = "#000000";
-    ctx.font = "11px sans-serif";
+    ctx.font = "16px sans-serif";
 
     labels.forEach((label, i) => {
       ctx.fillText(label, colWidth * (i + 0.5), labelY);
